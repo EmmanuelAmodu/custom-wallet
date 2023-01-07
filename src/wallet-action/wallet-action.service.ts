@@ -2,7 +2,7 @@ import { TransactionService } from '@circle/transaction/transaction.service';
 import { FEE, KFK_NAMES } from '@circle/utils/constants';
 import { WalletService } from '@circle/wallet/wallet.service';
 import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientKafka  } from '@nestjs/microservices';
 import {
   PrismaClient,
   Transaction,
@@ -34,21 +34,21 @@ export class WalletActionService {
     private transactionService: TransactionService,
     private walletService: WalletService,
     @Inject(KFK_NAMES.BANK_SERVICE)
-    private readonly bankclient: ClientProxy,
+    private readonly bankclient: ClientKafka,
     @Inject(KFK_NAMES.SAVINGS_SERVICE)
-    private readonly savingsclient: ClientProxy,
+    private readonly savingsclient: ClientKafka,
     @Inject(KFK_NAMES.BILLS_SERVICE)
-    private readonly billsclient: ClientProxy,
+    private readonly billsclient: ClientKafka,
     @Inject(KFK_NAMES.INSURANCE_SERVICE)
-    private readonly insuranceclient: ClientProxy,
+    private readonly insuranceclient: ClientKafka,
     @Inject(KFK_NAMES.STOCK_TRADING_SERVICE)
-    private readonly stockTradeclient: ClientProxy,
+    private readonly stockTradeclient: ClientKafka,
     @Inject(KFK_NAMES.LOAN_SERVICE)
-    private readonly loanclient: ClientProxy,
+    private readonly loanclient: ClientKafka,
     @Inject(KFK_NAMES.INVESTMENT_SERVICE)
-    private readonly investclient: ClientProxy,
+    private readonly investclient: ClientKafka,
     @Inject(KFK_NAMES.CREDIT_CARD_SERVICE)
-    private readonly creditCardClient: ClientProxy,
+    private readonly creditCardClient: ClientKafka,
   ) {}
 
   async convertAction(userId: string, data: ConvertActionDto) {
