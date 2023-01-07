@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Wallet {
+  id           String        @id @default(cuid())
+  balance      Float         @default(0)
+  userId       String        @map("user_id")
+  lastEventtId String?       @map("last_tx_id")
+  locked       Boolean       @default(false)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  currency     Currency
+  transaction  Transaction[]
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id                      String                   @id @default(cuid())
+  userId                  String                   @map("user_id")
+  walletId                String                   @map("wallet_id")
+  amount                  Float
+  type                    TransactionType
+  status                  TransactionStatus        @default(INIT)
+  createdAt               DateTime                 @default(now()) @map("created_at")
+  updatedAt               DateTime                 @updatedAt @map("updated_at")
+  thirdPartyTxId          String?                  @map("third_party_tx_id")
+  eventType               TransactionEventType
+  eventId                 String
+  currency                Currency
+  convertEventId          String?                  @map("convert_event_id")
+  internalTransferEventId String?                  @map("internal_transfer_event_id")
+  cryptoWithdrawalEventId String?                  @map("crypto_withdrawal_event_id")
+  cryptoDepositEventId    String?                  @map("crypto_deposit_event_id")
+  depositEventId          String?                  @map("deposit_event_id")
+  withdrawalEventId       String?                  @map("withdrawal_event_id")
+  reversalEventId         String?                  @map("reversal_event_id")
+  savingsEventId          String?                  @map("savings_event_id")
+  billPaymentEventId      String?                  @map("bill_payment_event_id")
+  insuranceEventId        String?                  @map("insurance_event_id")
+  tradeStockEventId       String?                  @map("trade_stock_event_id")
+  investmentEventId       String?                  @map("investment_event_id")
+  loanEventId             String?                  @map("loan_event_id")
+  creditCardEventId       String?                  @map("credit_card_event_id")
+  depositEvent            DepositEvent?            @relation(fields: [depositEventId], references: [id])
+  withdrawalEvent         WithdrawalEvent?         @relation(fields: [withdrawalEventId], references: [id])
+  internalTransferEvent   InternalTransferEvent?   @relation(fields: [internalTransferEventId], references: [id])
+  reversalEvent           ReversalEvent?           @relation(fields: [reversalEventId], references: [id])
+  convertEvent            ConvertEvent?            @relation(fields: [convertEventId], references: [id])
+  savingsEvent            SavingsEvent?            @relation(fields: [savingsEventId], references: [id])
+  billPaymentEvent        BillPaymentEvent?        @relation(fields: [billPaymentEventId], references: [id])
+  insuranceEvent          InsuranceEvent?          @relation(fields: [insuranceEventId], references: [id])
+  tradeStockEvent         TradeStockEvent?         @relation(fields: [tradeStockEventId], references: [id])
+  investmentEvent         InvestmentEvent?         @relation(fields: [investmentEventId], references: [id])
+  loanEvent               LoanEvent?               @relation(fields: [loanEventId], references: [id])
+  creditCardEvent         CreditCardEvent?         @relation(fields: [creditCardEventId], references: [id])
+  wallet                  Wallet                   @relation(fields: [walletId], references: [id])
+  statusEvents            TransactionStatusEvent[]
+
+  @@index([depositEventId], map: "transactions_deposit_event_id_fkey")
+  @@index([withdrawalEventId], map: "transactions_withdrawal_event_id_fkey")
+  @@index([internalTransferEventId], map: "transactions_internal_transfer_event_id_fkey")
+  @@index([reversalEventId], map: "transactions_reversal_event_id_fkey")
+  @@index([convertEventId], map: "transactions_convert_event_id_fkey")
+  @@index([savingsEventId], map: "transactions_savings_event_id_fkey")
+  @@index([billPaymentEventId], map: "transactions_bill_payment_event_id_fkey")
+  @@index([insuranceEventId], map: "transactions_insurance_event_id_fkey")
+  @@index([tradeStockEventId], map: "transactions_trade_stock_event_id_fkey")
+  @@index([investmentEventId], map: "transactions_investment_event_id_fkey")
+  @@index([loanEventId], map: "transactions_loan_event_id_fkey")
+  @@index([creditCardEventId], map: "transactions_credit_card_event_id_fkey")
+  @@index([walletId], map: "transactions_wallet_id_fkey")
+  @@map("transactions")
+}
+
+model TransactionStatusEvent {
+  id                String            @id @default(cuid())
+  status            TransactionStatus
+  transactionId     String            @map("transaction_id")
+  thirdPartyDetails Json?             @map("third_party_details")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  transaction       Transaction       @relation(fields: [transactionId], references: [id])
+
+  @@index([transactionId], map: "transaction_status_events_transaction_id_fkey")
+  @@map("transaction_status_events")
+}
+
+model ConvertEvent {
+  id           String        @id @default(cuid())
+  fromAmount   Float         @map("from_amount")
+  exchangeRate Float         @map("exchange_rate")
+  fees         Float
+  toAmount     Float         @map("to_amount")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currencyFrom Currency
+  currencyTo   Currency
+  transactions Transaction[]
+
+  @@map("convert_events")
+}
+
+model InternalTransferEvent {
+  id           String        @id @default(cuid())
+  fromUser     String        @map("from_user")
+  toUser       String        @map("to_user")
+  amount       Float
+  fees         Float
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currency     Currency
+  transactions Transaction[]
+
+  @@map("internal_transfer_events")
+}
+
+model DepositEvent {
+  id           String        @id @default(cuid())
+  userId       String        @map("from_user")
+  amount       Float
+  fees         Float
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currency     Currency
+  transactions Transaction[]
+
+  @@map("deposit_events")
+}
+
+model WithdrawalEvent {
+  id           String        @id @default(cuid())
+  userId       String        @map("from_user")
+  amount       Float
+  fees         Float
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currency     Currency
+  transactions Transaction[]
+
+  @@map("withdrawal_events")
+}
+
+model SavingsEvent {
+  id           String        @id @default(cuid())
+  userId       String        @map("from_user")
+  amount       Float
+  fees         Float
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currency     Currency
+  savingsType  SavingsType
+  transactions Transaction[]
+
+  @@map("savings_events")
+}
+
+model BillPaymentEvent {
+  id           String        @id @default(cuid())
+  userId       String        @map("from_user")
+  amount       Float
+  fees         Float
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currency     Currency
+  billType     BillType
+  billData     Json
+  transactions Transaction[]
+
+  @@map("bill_payment_events")
+}
+
+model InsuranceEvent {
+  id            String        @id @default(cuid())
+  userId        String        @map("from_user")
+  amount        Float
+  fees          Float
+  createdAt     DateTime      @default(now()) @map("created_at")
+  currency      Currency
+  insuranceType InsuranceType
+  insuranceData Json
+  transactions  Transaction[]
+
+  @@map("insurance_events")
+}
+
+model TradeStockEvent {
+  id             String        @id @default(cuid())
+  userId         String        @map("from_user")
+  amount         Float
+  fees           Float
+  createdAt      DateTime      @default(now()) @map("created_at")
+  currency       Currency
+  tradeStockData Json
+  transactions   Transaction[]
+
+  @@map("trade_stock_events")
+}
+
+model InvestmentEvent {
+  id           String        @id @default(cuid())
+  userId       String        @map("from_user")
+  amount       Float
+  fees         Float
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currency     Currency
+  transactions Transaction[]
+
+  @@map("investment_events")
+}
+
+model LoanEvent {
+  id           String        @id @default(cuid())
+  userId       String        @map("from_user")
+  amount       Float
+  fees         Float
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currency     Currency
+  transactions Transaction[]
+
+  @@map("loan_events")
+}
+
+model CreditCardEvent {
+  id           String        @id @default(cuid())
+  userId       String        @map("from_user")
+  amount       Float
+  fees         Float
+  createdAt    DateTime      @default(now()) @map("created_at")
+  currency     Currency
+  transactions Transaction[]
+
+  @@map("credit_card_events")
+}
+
+model ReversalEvent {
+  id                String        @id @default(cuid())
+  fromUser          String        @map("from_user")
+  toUser            String        @map("to_user")
+  amount            Float
+  thirdPartyDetails Json?         @map("third_party_details")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  currency          Currency
+  transactions      Transaction[]
+
+  @@map("reversal_events")
+}
+
+model AssetPrice {
+  id       String   @id @default(cuid())
+  amount   Float
+  priceAt  DateTime @default(now()) @map("price_at")
+  currency Currency
+}
+
+enum TransactionEventType {
+  ConvertEvent
+  InternalTransferEvent
+  InsuranceEvent
+  TradeStockEvent
+  LoanEvent
+  CreditCardEvent
+  InvestmentEvent
+  WithdrawalEvent
+  DepositEvent
+  ReversalEvent
+  SavingsEvent
+  BillPaymentEvent
+}
+
+enum TransactionStatus {
+  INIT
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum Currency {
+  NGN
+  GHS
+  CAF
+  USD
+}
+
+enum SavingsType {
+  FIXED
+  VARIABLE
+}
+
+enum BillType {
+  AIRTIME
+  DATA
+  ELECTRICITY
+}
+
+enum InsuranceType {
+  CAR_INSURANCE
+  LIFE_INSURANCE
+}
