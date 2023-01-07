@@ -11,6 +11,7 @@ import { WalletModule } from '@circle/wallet/wallet.module';
 import { InternalCacheModule } from '@circle/internal-cache/internal-cache.module';
 import { JwtModule } from '@nestjs/jwt';
 import config from '../config';
+import { KafkaClients } from './wallet-action.clients';
 
 @Module({
   imports: [
@@ -19,21 +20,7 @@ import config from '../config';
       secret: config.jwt.secret,
       signOptions: { expiresIn: parseInt(config.jwt.expiresIn) },
     }),
-    ClientsModule.register([
-      {
-        name: KFK_NAMES.BANK_SERVICE,
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            clientId: KFK_CLIENTS.BANK_CLIENT,
-            brokers: config.kafka.brokers,
-          },
-          consumer: {
-            groupId: KFK_GROUPS.BANK_GROUP,
-          },
-        },
-      },
-    ]),
+    ClientsModule.register(KafkaClients),
     TransactionModule,
     WalletModule,
   ],

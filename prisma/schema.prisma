@@ -31,8 +31,8 @@ model Transaction {
   createdAt               DateTime                 @default(now()) @map("created_at")
   updatedAt               DateTime                 @updatedAt @map("updated_at")
   thirdPartyTxId          String?                  @map("third_party_tx_id")
-  eventType               TransactionEventType
-  eventId                 String
+  eventType               TransactionEventType     @map("event_type")
+  eventId                 String                   @map("event_id")
   currency                Currency
   convertEventId          String?                  @map("convert_event_id")
   internalTransferEventId String?                  @map("internal_transfer_event_id")
@@ -149,7 +149,7 @@ model SavingsEvent {
   fees         Float
   createdAt    DateTime      @default(now()) @map("created_at")
   currency     Currency
-  savingsType  SavingsType
+  savingsType  SavingsType   @map("savings_type")
   transactions Transaction[]
 
   @@map("savings_events")
@@ -162,8 +162,8 @@ model BillPaymentEvent {
   fees         Float
   createdAt    DateTime      @default(now()) @map("created_at")
   currency     Currency
-  billType     BillType
-  billData     Json
+  billType     BillType      @map("bill_type")
+  billData     Json          @map("bill_data")
   transactions Transaction[]
 
   @@map("bill_payment_events")
@@ -176,8 +176,8 @@ model InsuranceEvent {
   fees          Float
   createdAt     DateTime      @default(now()) @map("created_at")
   currency      Currency
-  insuranceType InsuranceType
-  insuranceData Json
+  insuranceType InsuranceType @map("insurance_type")
+  insuranceData Json          @map("insurance_data")
   transactions  Transaction[]
 
   @@map("insurance_events")
@@ -190,7 +190,7 @@ model TradeStockEvent {
   fees           Float
   createdAt      DateTime      @default(now()) @map("created_at")
   currency       Currency
-  tradeStockData Json
+  tradeStockData Json          @map("trade_stock_data")
   transactions   Transaction[]
 
   @@map("trade_stock_events")
