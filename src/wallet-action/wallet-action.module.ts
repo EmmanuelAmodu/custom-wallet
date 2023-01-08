@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { WalletActionService } from './wallet-action.service';
 import { WalletActionController } from './wallet-action.controller';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { KFK_NAMES, KFK_CLIENTS, KFK_GROUPS } from '@circle/utils/constants';
+import { ClientsModule } from '@nestjs/microservices';
 import { HttpResponse } from '@circle/utils/http.response';
 import { ErrorResponse } from '@circle/utils/error.util';
 import { PrismaClient } from '@prisma/client';

@@ -17,6 +17,7 @@ import {
   StockTradeActionDto,
   LoanActionDto,
   InvestmentActionDto,
+  ReverseTransactionActionDto,
 } from './dto/wallet-action.dto';
 import { WalletActionService } from './wallet-action.service';
 
@@ -229,5 +230,13 @@ export class WalletActionController {
   })
   async createDepositAction(@Payload() data: ExternalTransactionActionDto) {
     await this.walletActionService.externalTransactionEvent(data);
+  }
+
+  @EventPattern({
+    cmd: 'reverse-transaction-action',
+    access: ['user.transaction.reverse'],
+  })
+  async reverseTxAction(@Payload() data: ReverseTransactionActionDto) {
+    await this.walletActionService.reverseTransactionEvent(data);
   }
 }

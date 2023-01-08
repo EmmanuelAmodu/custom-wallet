@@ -211,3 +211,16 @@ export class ExternalTransactionActionDto {
   @IsObject()
   thirdPartyDetails?: any;
 }
+
+export class ReverseTransactionActionDto {
+  @IsString()
+  @IsNotEmpty()
+  eventId: string;
+  @IsEnum(TransactionEventType)
+  txType: TransactionEventType;
+  @IsString()
+  @IsNotEmpty()
+  reason: string;
+  @IsObject()
+  thirdPartyDetails?: any;
+}

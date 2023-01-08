@@ -233,12 +233,13 @@ model CreditCardEvent {
 }
 
 model ReversalEvent {
-  id                String        @id @default(cuid())
-  fromUser          String        @map("from_user")
-  toUser            String        @map("to_user")
+  id                String               @id @default(cuid())
+  userId            String               @map("user_id")
   amount            Float
-  thirdPartyDetails Json?         @map("third_party_details")
-  createdAt         DateTime      @default(now()) @map("created_at")
+  thirdPartyDetails Json?                @map("third_party_details")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  eventType         TransactionEventType @map("event_type")
+  eventId           String               @map("event_id")
   currency          Currency
   transactions      Transaction[]
 

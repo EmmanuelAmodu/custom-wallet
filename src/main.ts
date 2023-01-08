@@ -16,7 +16,7 @@ async function bootstrap() {
     options: {
       client: {
         brokers: config.kafka.brokers,
-        clientId: 'circle-wallet',
+        clientId: 'WALLET_CLIENT',
       },
     },
   });

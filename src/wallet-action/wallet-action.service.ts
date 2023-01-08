@@ -2,7 +2,7 @@ import { TransactionService } from '@circle/transaction/transaction.service';
 import { FEE, KFK_NAMES } from '@circle/utils/constants';
 import { WalletService } from '@circle/wallet/wallet.service';
 import { Inject, Injectable } from '@nestjs/common';
-import { ClientKafka  } from '@nestjs/microservices';
+import { ClientKafka } from '@nestjs/microservices';
 import {
   PrismaClient,
   Transaction,
@@ -25,10 +25,24 @@ import {
   LoanActionDto,
   InvestmentActionDto,
   CreditCardActionDto,
+  ReverseTransactionActionDto,
 } from './dto/wallet-action.dto';
 
 @Injectable()
 export class WalletActionService {
+  private eventToModelMap = {
+    [TransactionEventType.DepositEvent]: this.prisma.depositEvent,
+    [TransactionEventType.WithdrawalEvent]: this.prisma.withdrawalEvent,
+    [TransactionEventType.SavingsEvent]: this.prisma.savingsEvent,
+    [TransactionEventType.BillPaymentEvent]: this.prisma.billPaymentEvent,
+    [TransactionEventType.CreditCardEvent]: this.prisma.creditCardEvent,
+    [TransactionEventType.InsuranceEvent]: this.prisma.insuranceEvent,
+    [TransactionEventType.InvestmentEvent]: this.prisma.investmentEvent,
+    [TransactionEventType.LoanEvent]: this.prisma.loanEvent,
+    [TransactionEventType.SavingsEvent]: this.prisma.savingsEvent,
+    [TransactionEventType.TradeStockEvent]: this.prisma.tradeStockEvent,
+  };
+
   constructor(
     private prisma: PrismaClient,
     private transactionService: TransactionService,
@@ -567,6 +581,54 @@ export class WalletActionService {
       data.status,
       data.thirdPartyDetails,
     );
+  }
+
+  async reverseTransactionEvent(data: ReverseTransactionActionDto) {
+    const model = this.eventToModelMap[data.txType];
+    if (!model) throw new Error('Action is not reversable');
+
+    const event = model.findUnique({
+      where: { id: data.eventId },
+      include: { transactions: true },
+    });
+
+    await this.walletService.lockWallet(event.userId, event.currency);
+    const reversal = await this.prisma.$transaction(async (prisma) => {
+      const reversal = await prisma.reversalEvent.create({
+        data: {
+          userId: event.userId,
+          amount: event.amount,
+          currency: event.currency,
+          eventType: data.txType,
+          eventId: event.id,
+        },
+      });
+
+      let txType: TransactionType = null;
+      if (event.transactions.type === TransactionType.CREDIT)
+        txType = TransactionType.DEBIT;
+      if (event.transactions.type === TransactionType.DEBIT)
+        txType = TransactionType.CREDIT;
+
+      await this.transactionService.createTransaction(prisma, {
+        amount: event.amount,
+        userId: event.userId,
+        currency: event.currency,
+        eventType: TransactionEventType.ReversalEvent,
+        eventId: reversal.id,
+        type: txType,
+      });
+
+      return reversal;
+    });
+
+    await this.walletService.unlockWallet(
+      event.userId,
+      event.currency,
+      event.id,
+    );
+
+    return reversal;
   }
 
   async calculateConvertRate(
