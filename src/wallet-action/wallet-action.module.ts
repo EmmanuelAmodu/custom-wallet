@@ -9,7 +9,7 @@ import { TransactionModule } from '@circle/transaction/transaction.module';
 import { WalletModule } from '@circle/wallet/wallet.module';
 import { InternalCacheModule } from '@circle/internal-cache/internal-cache.module';
 import { JwtModule } from '@nestjs/jwt';
-import config from '../config';
+import config from '@circle/config';
 import { KafkaClients } from './wallet-action.clients';
 
 @Module({

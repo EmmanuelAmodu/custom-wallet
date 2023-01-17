@@ -1,4 +1,4 @@
-import config from '../../config';
+import config from '../@circle/config';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';

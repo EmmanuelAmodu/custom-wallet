@@ -5,7 +5,7 @@ import { HttpResponse } from '@circle/utils/http.response';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaClient } from '@prisma/client';
-import config from '../../config';
+import config from '@circle/config';
 import { WalletController } from './wallet.controller';
 import { WalletService } from './wallet.service';
 
