@@ -1,9 +1,9 @@
-import config from '../@circle/config';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { InternalCacheService } from '@circle/internal-cache/internal-cache.service';
+import config from '@circle/config';
 
 export interface AuthToken {
   userId: string;

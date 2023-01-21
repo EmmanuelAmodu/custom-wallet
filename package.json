@@ -86,6 +86,14 @@
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^@circle/(.*)$": "<rootDir>/../src/$1"
+    },
+    "setupFiles": [
+      "<rootDir>/jest-setup.ts"
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "./tsconfig.jest.json"
+      }
     }
   }
 }
