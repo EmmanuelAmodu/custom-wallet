@@ -1,4 +1,4 @@
-# circle Service API Template
+# Service API Template
 
 ## Description
 
